@@ -1,0 +1,37 @@
+spring:
+  cloud:
+    nacos:
+      discovery:
+        group: ${spring.profiles.active}
+        namespace: ${spring.profiles.active}
+        server-addr: 13.214.141.254:8848
+  datasource:
+    username: root
+    password: bu1myXupteiwHC1jT3hp
+    url: jdbc:mariadb://13.214.141.254:3306/dpcq?serverTimezone=Asia/Shanghai
+    driver-class-name: org.mariadb.jdbc.Driver
+
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+#      password: aaawobuxiangnuliliao
+      database: 0
+
+#mybatis-plus:
+#  configuration:
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+ai:
+  ollama:
+    base-url: http://localhost:11434
+    chat:
+      options:
+        model: gemma3:12b
+  api:
+    deepseek-url: https://api.deepseek.com/chat/completions
+    deepseek-key: Bearer sk-d64385c6e0b7415b9de6036a3d3cee30
+
+ws:
+  service:
+#    url: ws://13.212.100.218:9006/ws/
+    url: wss://ws.dpcq.club/ws/

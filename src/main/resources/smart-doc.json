@@ -1,0 +1,20 @@
+{
+  "serverUrl": "./",
+  "outPath": "src/main/resources/static",
+  "coverOld": true,
+  "allInOne":true,
+  "createDebugPage": true,
+  "projectName": "ai",
+  "inlineEnum": true,
+  "requestHeaders": [
+    {
+      "name": "Authorization",
+      "type": "string",
+      "desc": "认证令牌，方便开发环境与测试环境调试，该令牌就是一个用户ID，测",
+      "value": "100000000",
+      "required": false,
+      "since": "-",
+      "excludePathPatterns": "/user/login/**,/user/register/**"
+    }
+  ]
+}

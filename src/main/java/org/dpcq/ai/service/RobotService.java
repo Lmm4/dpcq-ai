@@ -1,0 +1,74 @@
+package org.dpcq.ai.service;
+
+import cn.hutool.core.lang.UUID;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.dpcq.ai.entity.RobotEntity;
+import org.dpcq.ai.enums.RobotCharacter;
+import org.dpcq.ai.llm.PromptGenerator;
+import org.dpcq.ai.llm.dto.TableData;
+import org.dpcq.ai.llm.model.DeepSeekV3ApiModel;
+import org.dpcq.ai.llm.model.GemmaOllamaModel;
+import org.dpcq.ai.pojo.req.RobotConnectParam;
+import org.dpcq.ai.repo.IRobotRepo;
+import org.dpcq.ai.rpc.FeignUserApi;
+import org.dpcq.ai.rpc.dto.RobotRegParam;
+import org.dpcq.ai.socket.WebSocketConnectionManager;
+import org.dpcq.ai.util.ServletIpUtil;
+import org.springframework.stereotype.Service;
+
+@Service
+@Slf4j
+@RequiredArgsConstructor
+public class RobotService {
+    private final FeignUserApi feignUserApi;
+    private final DeepSeekV3ApiModel deepSeekV3ApiModel;
+    private final GemmaOllamaModel gemmaOllamaModel;
+    private final IRobotRepo robotRepo;
+    private final WebSocketConnectionManager connectionManager;
+
+    /**
+     * 创建机器人
+     */
+    public boolean createRobot(HttpServletRequest request){
+        RobotRegParam form = new RobotRegParam();
+        form.setUsername("robot" + System.currentTimeMillis());
+        form.setPassword(UUID.fastUUID().toString(true).substring(0,14));
+        form.setIp(ServletIpUtil.getClientIP(request));
+        Long userId = feignUserApi.registerRobot(form);
+        robotRepo.save(RobotEntity.builder()
+                        .characters(RobotCharacter.getRandomRobotCharacter())
+                        .userId(userId)
+                        .status(1)
+                        .build());
+        return true;
+    }
+
+    /**
+     * 连接游戏
+     */
+    public boolean connectGame(RobotConnectParam param){
+        RobotEntity robot = robotRepo.getById(param.getRobotId());
+        if (robot == null) {
+            throw new RuntimeException("机器人不存在");
+        }
+        if (robot.getStatus() == 0) {
+            throw new RuntimeException("机器人已关闭");
+        }
+        if (connectionManager.isRobotInGame(robot.getUserId().toString())) {
+            throw new RuntimeException("机器人已连接");
+        }
+        connectionManager.createConnection(robot, param.getTableId().toString());
+        return true;
+    }
+
+    public String getV3Response(TableData data) {
+        return deepSeekV3ApiModel.getResponse("",PromptGenerator.getUserContent(data));
+    }
+
+    public String getGemmaResponse(TableData data) {
+        return gemmaOllamaModel.getResponse("",PromptGenerator.getUserContent(data));
+    }
+
+}

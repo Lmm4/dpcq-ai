@@ -1,0 +1,63 @@
+spring:
+  ip: 172.31.39.209
+  cloud:
+    nacos:
+      discovery:
+        group: ${spring.profiles.active}
+        namespace: ${spring.profiles.active}
+        server-addr: ${spring.ip}:8848
+        username: nacos
+        password: nDxIC#v%#U$aqM1INmy*OeG9gEoDjuFA
+  datasource:
+    username: dpcq
+    password: 3DMEEh58By28CS3j
+    url: jdbc:mariadb://${spring.ip}:3306/dpcq
+    driver-class-name: org.mariadb.jdbc.Driver
+
+  data:
+    redis:
+      host: ${spring.ip}
+      port: 6379
+      password: H1SrzESCjdcYBrEVejMmdDqKvSwzpnWP
+      database: 0
+
+  kafka:
+    bootstrap-servers: ${spring.ip}:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      acks: 1
+    consumer:
+      group-id: ${spring.cloud.nacos.discovery.group}
+      enable-auto-commit: true
+      key-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      properties:
+        spring.deserializer.key.delegate.class: org.apache.kafka.common.serialization.StringDeserializer
+        spring.deserializer.value.delegate.class: org.apache.kafka.common.serialization.StringDeserializer
+    listener:
+      ack-mode: record
+
+delay:
+  core: 10
+  queue: 10000
+
+logic:
+  squidGameInitAnimeDelay: 5000 # 鱿鱼游戏初始化动画5s
+  betTimeoutDelay: 15000 # 下注延迟，毫秒
+  betTimeoutOperationDelay: 10000 # 操作延迟，毫秒
+  betTimeoutDelayCount: 2 # 回合下注延迟次数
+  betAnimeDelay: 1000 # 普通动画延迟，毫秒
+  rabbitDelay: 2500 # 猎兔延迟，毫秒
+  showHandsAnimeDelay: 2500 # 秀牌延迟，毫秒
+  clearRoundDelay: 4000 # 清理牌桌延迟，毫秒
+  finalClearSquidRoundDelay: 9000 # 最终清理鱿鱼牌桌延迟，毫秒
+  publishHandCardsAnimeDelay: 2500
+  publish3BoardsAnimeDelay: 2500
+  publish1BoardAnimeDelay: 2000
+  hangUpCheckEnable: true # 挂机检测功能是否打开
+  hangUpCheckMaxCount: 6 # 挂机检查操作超时次数
+  waitBringInTimeout: 60000 # 带入超时踢出，毫秒
+  heartbeatCheckEnable: true # 心跳检测是否启动
+  heartbeatMaxInterval: 300000 # 心跳停止最大间隔，毫秒
+  insBuyTimeoutDelay: 15000 # 保险等待时间
