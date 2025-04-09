@@ -51,7 +51,7 @@ public class MessageProcessor {
 
     private void handleUnknownType(String connectionId, String type ,String message) {
         // 未实现处理的消息类型
-        log.info("未实现处理的消息类型：{},MSG:{}",type,message);
+        log.debug("未实现处理的消息类型：{},MSG:{}",type,message);
     }
 
 

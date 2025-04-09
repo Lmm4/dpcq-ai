@@ -1,5 +1,6 @@
 package org.dpcq.ai.socket.handler;
 
+import cn.hutool.core.util.RandomUtil;
 import com.dpcq.base.utils.JsonUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -12,14 +13,15 @@ import org.dpcq.ai.enums.Stage;
 import org.dpcq.ai.llm.LLMSelector;
 import org.dpcq.ai.llm.dto.TableData;
 import org.dpcq.ai.llm.dto.V3Response;
+import org.dpcq.ai.pojo.Constants;
 import org.dpcq.ai.socket.SessionHandler;
 import org.dpcq.ai.socket.handler.dto.req.ActionParams;
 import org.dpcq.ai.util.MdToJsonUtil;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @Component
 @Slf4j
@@ -27,6 +29,7 @@ import java.util.Random;
 public class RobotNotifyHandler implements MessageHandler{
     private final ObjectMapper objectMapper;
     private final LLMSelector llmSelector;
+    private final StringRedisTemplate redisTemplate;
     @Override
     public String getHandlerType(String ops) {
         return Ops.ROBOT_DATA.name();
@@ -36,15 +39,29 @@ public class RobotNotifyHandler implements MessageHandler{
     public void handle(String userId, String msg, SessionHandler sessionHandler) {
         try {
             TableData data = JsonUtils.parse(msg, TableData.class);
-            data.setCharacterId(sessionHandler.getUserCharactor());
-            String content = llmSelector.callAI(data);
-            log.info("大模型响应数据：{}", content);
-            ActionParams action = dealJson(content,data);
+            data.setCharacterId(sessionHandler.getRobotInfo().getCharacterId());
+            ActionParams action = new ActionParams();
+            // 翻牌前处理
+            if (data.getStage().equals(Stage.PRE_FLOP.getStage())){
+                preFlopProcess(action,data);
+            }
+            // 处理最后余额小于最小投注的情况，选择allin
+            if (action.getOps() == null){
+                lessChipProcess(action,data);
+            }
+            // 调用AI模型
+            if (action.getOps() == null){
+                String content = llmSelector.callAI(data);
+                log.info("大模型响应数据：{}", content);
+                dealJson(action,content,data);
+            }
             log.info("决策结果：{}", action);
-
             action.setUserOps(true);
             action.setTimeout(data.getTimeout());
             sessionHandler.sendMessage(JsonUtils.toJsonString(action));
+            // 缓存机器人链接状态
+            redisTemplate.opsForValue().set(String.format(Constants.ROBOT_ONLINE_KEY, userId), JsonUtils.toJsonString(sessionHandler.getRobotInfo()), 3, TimeUnit.MINUTES);
+
         }catch (Exception e){
             log.error("解析机器人数据报错");
             e.printStackTrace();
@@ -64,15 +81,50 @@ public class RobotNotifyHandler implements MessageHandler{
                 "}";
         TableData data = new TableData();
         data.setStage(Stage.PRE_FLOP.getStage());
-        dealJson(json1,data);
+        ActionParams actionParams = null;
+//        dealJson(actionParams,json1,data);
+    }
+
+    /**
+     * 翻牌前处理（除激进外，对子）
+     */
+    private void preFlopProcess(ActionParams action, TableData data) {
+        String[] cards = data.getHandCards().split(",");
+        // 是否对子
+        boolean isPair = cards[0].charAt(0) == cards[1].charAt(0);
+        if (!isPair){
+
+        }
+    }
+
+    /**
+     * 非翻牌前，特殊处理小额必须allin时的情况
+     */
+    private void lessChipProcess(ActionParams action, TableData data){
+        if (!data.getStage().equals(Stage.PRE_FLOP.getStage()) && Objects.equals(data.getChips(), data.getMinBet())){
+            // 本手中其它玩家下注最大值
+            Long bet = Optional.ofNullable(data.getActions())
+                    .orElse(Collections.emptyList())
+                    .stream()
+                    .map(TableData.Action::getBet)
+                    .filter(Objects::nonNull)
+                    .max(Long::compare)
+                    .orElse(0L);
+            // 剩余筹码小于最高投注5%时，大概率allin
+            // 0-100内随机一个数
+            long random = RandomUtil.randomLong(0,100);
+            if (data.getChips() < (bet / 20) && random < 85L){
+                setBetAction(action, data.getChips());
+            }
+        }
     }
 
     /**
      * 处理大模型响应数据
      */
-    private static ActionParams dealJson(String json, TableData data){
+    private void dealJson(ActionParams action,String json, TableData data){
         try {
-            ObjectNode rootNode = (ObjectNode) new ObjectMapper().readTree(json);
+            ObjectNode rootNode = (ObjectNode) objectMapper.readTree(json);
             // 通过操作权重计算结果
             long raiseRateValue = 0;
             // 移除 amount字段
@@ -119,7 +171,6 @@ public class RobotNotifyHandler implements MessageHandler{
                     break;
                 }
             }
-            ActionParams action = new ActionParams();
             switch (op) {
                 case "fold":
                     action.setOps(Ops.FOLD);
@@ -144,8 +195,6 @@ public class RobotNotifyHandler implements MessageHandler{
             if (action.getOps().equals(Ops.FOLD) && json.contains("check")){
                 setBetAction(action, 0L);
             }
-
-            return action;
         } catch (JsonProcessingException e) {
             log.error("解析AI响应数据出错");
             throw new RuntimeException(e);

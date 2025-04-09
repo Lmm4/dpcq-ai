@@ -1,7 +1,7 @@
 package org.dpcq.ai.socket;
 
 import lombok.extern.slf4j.Slf4j;
-import org.dpcq.ai.entity.RobotEntity;
+import org.dpcq.ai.socket.handler.dto.RobotInfo;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -32,12 +32,17 @@ public class WebSocketConnectionManager {
         this.messageProcessor = messageProcessor;
     }
 
-    public CompletableFuture<String> createConnection(RobotEntity robot, String tableId) {
-        String userId = robot.getUserId().toString();
+    public SessionHandler getSessionByUserId(String userId) {
+        return sessions.get(userId);
+    }
+
+    public CompletableFuture<String> createConnection(RobotInfo robotInfo) {
+        String userId = robotInfo.getUserId();
+        String tableId = robotInfo.getTableId();
         CompletableFuture<String> future = new CompletableFuture<>();
         try {
             String s = url + userId + "/" + tableId;
-            SessionHandler handler = new SessionHandler(userId, robot.getCharacters(), messageProcessor, future);
+            SessionHandler handler = new SessionHandler(robotInfo, messageProcessor, future);
             webSocketClient.execute(handler, new WebSocketHttpHeaders(), URI.create(s));
             sessions.put(userId, handler);
         } catch (Exception e) {

@@ -18,14 +18,34 @@ import org.dpcq.ai.llm.dto.V3Response;
 import org.dpcq.ai.util.MdToJsonUtil;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
 @Slf4j
-@RequiredArgsConstructor
 public class DeepSeekV3ApiModel implements LLMStrategy {
 
     private final AiConfig aiConfig;
+    // 密钥列表
+    private final List<String> apiKeys;
+    private final AtomicInteger currentKeyIndex = new AtomicInteger(0);
+    public DeepSeekV3ApiModel(AiConfig aiConfig) {
+        this.aiConfig = aiConfig;
+        String keys = aiConfig.getDeepseekKey();
+        if (keys == null || keys.isEmpty()) {
+            throw new IllegalArgumentException("Deepseek API keys 不能为空");
+        }
+        this.apiKeys = Arrays.asList(keys.split(","));
+    }
+    // 轮询获取密钥
+    private String getNextApiKey() {
+        int index = currentKeyIndex.getAndUpdate(i -> (i + 1) % apiKeys.size());
+        String key = apiKeys.get(index);
+//        log.info("调用DEEPSEEK-API使用<{}>号密钥:{}",index,key);
+        return key;
+    }
+
 
     @Override
     public boolean isEnabled() {
@@ -47,7 +67,7 @@ public class DeepSeekV3ApiModel implements LLMStrategy {
         Request request = new Request.Builder()
                 .url(aiConfig.getDeepseekUrl())
                 .post(RequestBody.create(JsonUtils.toJsonString(requestMsg), MediaType.parse("application/json")))
-                .addHeader("Authorization", aiConfig.getDeepseekKey())
+                .addHeader("Authorization","Bearer " + getNextApiKey())
                 .build();
         try {
             okhttp3.Response response = client.newCall(request).execute();

@@ -29,7 +29,7 @@ ai:
         model: gemma3:12b
   api:
     deepseek-url: https://api.deepseek.com/chat/completions
-    deepseek-key: Bearer sk-d64385c6e0b7415b9de6036a3d3cee30
+    deepseek-key: sk-d64385c6e0b7415b9de6036a3d3cee30,sk-974cc98becea4366bd7e600247631027,sk-680de36d8a704211917635c948138148,sk-7c54ac232fbb4e66a7d7135db8f2431b,sk-c8dd88f9b212467f807f7d703f2e0232
 
 ws:
   service:

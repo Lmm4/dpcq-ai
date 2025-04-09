@@ -10,7 +10,6 @@ import lombok.experimental.Accessors;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
 @TableName("robot")
 public class RobotEntity extends BaseEntity{
 
@@ -19,6 +18,10 @@ public class RobotEntity extends BaseEntity{
      * 风格
      */
     private Integer characters;
+    /**
+     * 筹码不足时是否补充带入
+     */
+    private boolean supplement;
     /**
      * 状态
      */

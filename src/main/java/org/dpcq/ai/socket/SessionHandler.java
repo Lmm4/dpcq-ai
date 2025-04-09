@@ -2,6 +2,8 @@ package org.dpcq.ai.socket;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.dpcq.ai.socket.handler.dto.RobotInfo;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
@@ -15,43 +17,40 @@ import java.util.concurrent.CompletableFuture;
 @Slf4j
 @Getter
 public class SessionHandler extends TextWebSocketHandler {
-    private final String userId;
-    private final Integer userCharactor;
+    private final RobotInfo robotInfo;
     private final MessageProcessor messageProcessor;
     private final CompletableFuture<String> connectionFuture;
     private WebSocketSession session;
 
-    public SessionHandler(String userId,
-                          Integer userCharactor,
+    public SessionHandler(RobotInfo robotInfo,
                           MessageProcessor messageProcessor,
                           CompletableFuture<String> connectionFuture) {
-        this.userId = userId;
-        this.userCharactor = userCharactor;
+        this.robotInfo = robotInfo;
         this.messageProcessor = messageProcessor;
         this.connectionFuture = connectionFuture;
     }
 
     @Override
-    public void afterConnectionEstablished(WebSocketSession session) {
+    public void afterConnectionEstablished(@NotNull WebSocketSession session) {
         this.session = session;
-        connectionFuture.complete(userId);
+        connectionFuture.complete(robotInfo.getUserId());
     }
 
     @Override
-    protected void handleTextMessage(WebSocketSession session, TextMessage message) {
-        log.info("{}接受消息：{}",userId,message.getPayload());
-        messageProcessor.process(userId, message.getPayload(),this);
+    protected void handleTextMessage(@NotNull WebSocketSession session, TextMessage message) {
+        log.debug("{}接受消息：{}",robotInfo.getUserId(),message.getPayload());
+        messageProcessor.process(robotInfo.getUserId(), message.getPayload(),this);
     }
 
     @Override
-    public void handleTransportError(WebSocketSession session, Throwable exception) {
+    public void handleTransportError(@NotNull WebSocketSession session, Throwable exception) {
         connectionFuture.completeExceptionally(exception);
     }
 
     public void sendMessage(String message) {
         if (isConnected()) {
             try {
-                log.info("{}发送消息：{}",userId,message);
+                log.debug("{}发送消息：{}",robotInfo.getUserId(),message);
                 session.sendMessage(new TextMessage(message));
             } catch (IOException e) {
                 log.error("发送消息失败：{}",message);

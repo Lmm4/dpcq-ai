@@ -14,9 +14,13 @@ import org.dpcq.ai.pojo.req.RobotConnectParam;
 import org.dpcq.ai.repo.IRobotRepo;
 import org.dpcq.ai.rpc.FeignUserApi;
 import org.dpcq.ai.rpc.dto.RobotRegParam;
+import org.dpcq.ai.socket.SessionHandler;
 import org.dpcq.ai.socket.WebSocketConnectionManager;
+import org.dpcq.ai.socket.handler.dto.RobotInfo;
 import org.dpcq.ai.util.ServletIpUtil;
 import org.springframework.stereotype.Service;
+
+import java.util.Date;
 
 @Service
 @Slf4j
@@ -59,8 +63,31 @@ public class RobotService {
         if (connectionManager.isRobotInGame(robot.getUserId().toString())) {
             throw new RuntimeException("机器人已连接");
         }
-        connectionManager.createConnection(robot, param.getTableId().toString());
+        RobotInfo robotInfo = new RobotInfo();
+        robotInfo.setSupplement(robot.isSupplement());
+        robotInfo.setCharacterId(robot.getCharacters());
+        robotInfo.setUserId(robot.getUserId().toString());
+        robotInfo.setTableId(param.getTableId().toString());
+        connectionManager.createConnection(robotInfo);
         return true;
+    }
+
+    /**
+     * 修改机器人筹码不足时是否带入状态
+     */
+    public boolean updateRobotAddStatus(Long robotId, boolean supplement) {
+        RobotEntity robot = robotRepo.getById(robotId);
+        if (robot == null) {
+            throw new RuntimeException("机器人不存在");
+        }
+        robot.setSupplement(supplement);
+        robot.setUpdateAt(new Date());
+        boolean b = robotRepo.updateById(robot);
+        SessionHandler sessionByUserId = connectionManager.getSessionByUserId(robot.getUserId().toString());
+        if (sessionByUserId != null){
+            sessionByUserId.getRobotInfo().setSupplement(supplement);
+        }
+        return b;
     }
 
     public String getV3Response(TableData data) {
