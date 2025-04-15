@@ -7,4 +7,5 @@ public enum LLMType {
     DEEPSEEK,
     GEMMA,
     SILICONFLOW,
+    GEMINI,
 }

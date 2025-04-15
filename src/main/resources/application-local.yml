@@ -18,6 +18,26 @@ spring:
 #      password: aaawobuxiangnuliliao
       database: 0
 
+  kafka:
+    bootstrap-servers: 13.212.100.218:9092 #
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      acks: 1
+    consumer:
+      group-id: ${spring.cloud.nacos.discovery.group}
+      enable-auto-commit: true
+      key-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      properties:
+        spring:
+          json:
+            trusted:
+              packages: "*"
+        spring.deserializer.key.delegate.class: org.apache.kafka.common.serialization.StringDeserializer
+        spring.deserializer.value.delegate.class: org.apache.kafka.common.serialization.StringDeserializer
+    listener:
+      ack-mode: record
 #mybatis-plus:
 #  configuration:
 #    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
@@ -28,10 +48,34 @@ ai:
       options:
         model: gemma3:12b
   api:
-    deepseek-url: https://api.deepseek.com/chat/completions
-    deepseek-key: sk-d64385c6e0b7415b9de6036a3d3cee30,sk-974cc98becea4366bd7e600247631027,sk-680de36d8a704211917635c948138148,sk-7c54ac232fbb4e66a7d7135db8f2431b,sk-c8dd88f9b212467f807f7d703f2e0232
-
+    deepseek:
+      url: https://api.deepseek.com/chat/completions
+      key:
+        - sk-d64385c6e0b7415b9de6036a3d3cee30
+        - sk-974cc98becea4366bd7e600247631027
+        - sk-680de36d8a704211917635c948138148
+        - sk-7c54ac232fbb4e66a7d7135db8f2431b
+        - sk-c8dd88f9b212467f807f7d703f2e0232
+        - sk-85f2eb8e7e84451cad5113b89a27a0d9
+        - sk-270a48867e474e9d8bbcedbe7f5bbbb2
+        - sk-705ba5c243cb472ea888ece1c7bb3a8c
+        - sk-e5df0f326de946df9f1644b30470a022
+        - sk-e1387eb265094a0fa603c2e44fe3decf
+    siliconflow:
+      url: https://api.siliconflow.com/v1/chat/completions
+      key:
+        - sk-mqjgtitlvjcyhrmwbtglthgqspycycrznwyhvsgetblfahdv
+        - sk-rojbxugqnfbaxdlahjmzzpuxrpjagwesdniyutnwtuqdvdvd
+        - sk-pnzfiackwrelxoijabdvdvuudnzyvetkgufpaywrbpfknmta
+    gemini:
+      url: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=
+      key:
+        - AIzaSyDaA2VMTww4LnVGO59CzbKR7iDURpLTXh4
+        - AIzaSyAR_c9VH-YwXxlX3FYKBN4IR8GnLxph1xc
 ws:
   service:
 #    url: ws://13.212.100.218:9006/ws/
     url: wss://ws.dpcq.club/ws/
+
+robot:
+  send-log: true

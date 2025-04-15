@@ -35,4 +35,9 @@ public class GemmaOllamaModel implements LLMStrategy {
                         .temperature(0.8).build()));
         return MdToJsonUtil.convert(chatResponse.getResult().getOutput().getText());
     }
+
+    @Override
+    public int getWeight() {
+        return 0;
+    }
 }

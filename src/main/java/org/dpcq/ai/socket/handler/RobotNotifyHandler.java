@@ -1,6 +1,7 @@
 package org.dpcq.ai.socket.handler;
 
 import cn.hutool.core.util.RandomUtil;
+import com.alibaba.nacos.common.utils.StringUtils;
 import com.dpcq.base.utils.JsonUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -39,6 +40,7 @@ public class RobotNotifyHandler implements MessageHandler{
     public void handle(String userId, String msg, SessionHandler sessionHandler) {
         try {
             TableData data = JsonUtils.parse(msg, TableData.class);
+            data.setUserId(userId);
             data.setCharacterId(sessionHandler.getRobotInfo().getCharacterId());
             ActionParams action = new ActionParams();
             // 翻牌前处理
@@ -52,6 +54,8 @@ public class RobotNotifyHandler implements MessageHandler{
             // 调用AI模型
             if (action.getOps() == null){
                 String content = llmSelector.callAI(data);
+                // todo 调用异常处理
+                if (StringUtils.isBlank(content))return;
                 log.info("大模型响应数据：{}", content);
                 dealJson(action,content,data);
             }

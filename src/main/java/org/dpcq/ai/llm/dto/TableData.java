@@ -13,6 +13,10 @@ public class TableData extends Notify {
      */
     private Integer characterId;
     /**
+     * 用户id
+     */
+    private String userId;
+    /**
      * 牌桌id
      */
     private Long tableId;

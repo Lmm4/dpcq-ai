@@ -4,6 +4,7 @@ import com.dpcq.base.annotation.AnonymousAccess;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.dpcq.ai.pojo.req.RobotConnectParam;
+import org.dpcq.ai.pojo.req.RobotIdParam;
 import org.dpcq.ai.pojo.req.UpdateRobotAddStatusParam;
 import org.dpcq.ai.service.RobotService;
 import org.springframework.validation.annotation.Validated;
@@ -43,10 +44,12 @@ public class AdminRobotController {
         return robotService.updateRobotAddStatus(param.getRobotId(), param.isSupplement());
     }
     /**
-     * 机器人列表
+     * 本手后站起
      */
-//    @PostMapping("list")
-//    public IPage list(@Validated @RequestBody RobotConnectParam param) {
-//        return robotService.list(param);
-//    }
+    @PostMapping("leaveNext")
+    @AnonymousAccess
+    public Boolean list(@RequestBody RobotIdParam param) {
+        robotService.leaveSeatNext(String.valueOf(param.getUserId()));
+        return true;
+    }
 }

@@ -26,7 +26,16 @@ public class OpsService {
         params.setOps(Ops.LEAVE_SEAT);
         params.setUserId(Long.valueOf(userId));
         sessionHandler.sendMessage(JsonUtils.toJsonString(params));
+        cancelWatchTable(userId,sessionHandler);
+    }
+
+    /**
+     * 退出房间
+     */
+    public void cancelWatchTable(String userId, SessionHandler sessionHandler) {
+        LeaveSeatParams params = new LeaveSeatParams();
         params.setOps(Ops.CANCEL_WATCH_TABLE);
+        params.setUserId(Long.valueOf(userId));
         sessionHandler.sendMessage(JsonUtils.toJsonString(params));
         sessionHandler.close();
     }

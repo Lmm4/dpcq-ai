@@ -1,5 +1,6 @@
 package org.dpcq.ai.enums;
 
+import com.alibaba.nacos.common.utils.StringUtils;
 import com.dpcq.base.utils.JsonUtils;
 import lombok.Getter;
 
@@ -91,6 +92,18 @@ public enum GameProcessEvent {
         }
         return JsonUtils.toJsonString(map);
     }
+
+    public static String translateFormat(String content){
+        for (GameProcessEvent value : values()) {
+            if (StringUtils.contains(content,value.getEvent()))
+                content = StringUtils.replace(content,value.event,value.desc);
+        }
+        if (StringUtils.contains(content,"amount")){
+            content = StringUtils.replace(content,"amount","加注数量");
+        }
+        return content;
+    }
+
 
 
 //    /**

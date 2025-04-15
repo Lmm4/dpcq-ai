@@ -4,4 +4,4 @@ spring:
   profiles:
     active: local
 server:
-  port: 9016
+  port: 9017

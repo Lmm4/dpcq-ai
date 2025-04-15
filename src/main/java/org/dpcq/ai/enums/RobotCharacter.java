@@ -6,8 +6,8 @@ import lombok.Getter;
 public enum RobotCharacter {
 
     RADICAL(1,"激进(尽量不弃牌,谨慎ALLIN)"),
-    STEADY(2,"稳健(专注手牌，不受他人影响)"),
-    CONSERVATISM(3,"保守"),
+    STEADY(2,"稳健(冷静分析最优策略)"),
+    CONSERVATISM(3,"保守(专注手牌，不受他人影响)"),
     ;
 
     private final int id;

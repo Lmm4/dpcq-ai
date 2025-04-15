@@ -28,14 +28,13 @@ public class OllamaController {
     }
     @PostMapping("/test/robot/{model}")
     @AnonymousAccess
-    public String testRobot(@PathVariable("model")String model, @RequestBody TableData data) {
-        String response = "";
-        if (model.equals("gemma")){
-            response = robotService.getGemmaResponse(data);
-        }else if (model.equals("V3")){
-            response = robotService.getV3Response(data);
-        }
-        return response;
+    public String testRobot(@PathVariable("model")String model, @RequestBody TableData data) throws Exception {
+        return switch (model) {
+            case "gemma" -> robotService.getGemmaResponse(data);
+            case "V3" -> robotService.getV3Response(data);
+            case "gemini" -> robotService.getGeminiResponse(data);
+            default -> "";
+        };
     }
 
 

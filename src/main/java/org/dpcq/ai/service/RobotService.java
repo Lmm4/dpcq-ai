@@ -9,6 +9,7 @@ import org.dpcq.ai.enums.RobotCharacter;
 import org.dpcq.ai.llm.PromptGenerator;
 import org.dpcq.ai.llm.dto.TableData;
 import org.dpcq.ai.llm.model.DeepSeekV3ApiModel;
+import org.dpcq.ai.llm.model.GeminiModel;
 import org.dpcq.ai.llm.model.GemmaOllamaModel;
 import org.dpcq.ai.pojo.req.RobotConnectParam;
 import org.dpcq.ai.repo.IRobotRepo;
@@ -31,6 +32,7 @@ public class RobotService {
     private final GemmaOllamaModel gemmaOllamaModel;
     private final IRobotRepo robotRepo;
     private final WebSocketConnectionManager connectionManager;
+    private final OpsService opsService;
 
     /**
      * 创建机器人
@@ -90,12 +92,28 @@ public class RobotService {
         return b;
     }
 
-    public String getV3Response(TableData data) {
+    /**
+     * 下一手离桌
+     */
+    public void leaveSeatNext(String userId){
+        SessionHandler session = connectionManager.getSessionByUserId(userId);
+        opsService.leaveSeatNext(userId, session);
+    }
+
+
+
+    public String getV3Response(TableData data) throws Exception {
         return deepSeekV3ApiModel.getResponse("",PromptGenerator.getUserContent(data));
     }
 
     public String getGemmaResponse(TableData data) {
         return gemmaOllamaModel.getResponse("",PromptGenerator.getUserContent(data));
+    }
+
+    private final GeminiModel geminiModel;
+
+    public String getGeminiResponse(TableData data) {
+        return geminiModel.getResponse("",PromptGenerator.getUserContent(data));
     }
 
 }
