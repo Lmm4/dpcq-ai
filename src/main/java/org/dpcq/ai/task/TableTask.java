@@ -38,7 +38,7 @@ public class TableTask {
                 return;
             }
             Long tableId = tableService.createTableByRobot(freeRobot.getUserId());
-            robotService.connectGame(new RobotConnectParam().setRobotId(freeRobot.getUserId()).setTableId(tableId));
+            robotService.connectGame(new RobotConnectParam().setRobotId(freeRobot.getId()).setTableId(tableId));
             log.info("【创建牌桌成功】当前机器人牌桌：{}, 创建牌桌：{}",num,tableId);
         }
     }

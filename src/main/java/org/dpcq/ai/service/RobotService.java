@@ -22,6 +22,7 @@ import org.dpcq.ai.util.ServletIpUtil;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -100,9 +101,14 @@ public class RobotService {
      */
     public RobotEntity getFreeRobot(){
         Collection<String> activeUserIds = connectionManager.getActiveUserIds();
-        return robotRepo.lambdaQuery().eq(RobotEntity::getStatus, 1)
-                .notIn(!activeUserIds.isEmpty(),RobotEntity::getUserId,activeUserIds)
-                .last("limit 1").one();
+        List<RobotEntity> list = robotRepo.lambdaQuery().eq(RobotEntity::getStatus, 1)
+                .notIn(!activeUserIds.isEmpty(), RobotEntity::getUserId, activeUserIds)
+                .list();
+        if (list.isEmpty()){
+            return null;
+        }
+        Collections.shuffle(list);
+        return list.get(0);
     }
 
     /**

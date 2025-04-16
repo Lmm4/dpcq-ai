@@ -121,8 +121,7 @@ public class TableService {
      * 随机牌局时间
      */
     private int getGameDuration(){
-        int[] gameDurations = {3600, 7200, 10800, 14400, 18000};
+        int[] gameDurations = {1, 2, 3, 4, 5};
         return gameDurations[random.nextInt(gameDurations.length)];
     }
-
 }
