@@ -16,7 +16,7 @@ public interface FeignClubApi {
     @PostMapping("/internal/register/robot")
     Long registerRobot(@RequestBody RobotRegParam body);
 
-    @PostMapping("/createTableByRobot")
+    @PostMapping("/internal/createTableByRobot")
     Long createTableByRobot(@RequestBody RobotTableAddReqParam vo);
     /**
      * 查询进行中的机器人牌桌列表
