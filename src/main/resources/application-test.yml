@@ -76,8 +76,8 @@ ai:
         - AIzaSyDGPZQ8LuJCgKuqwZ2xGr7sqK8bxRGF0Qo
 ws:
   service:
-#    url: ws://13.212.100.218:9006/ws/
-    url: wss://ws.dpcq.club/ws/
+    url: ws://13.212.100.218:9006/ws/
+#    url: wss://ws.dpcq.club/ws/
 
 robot:
-  send-log: true
+  send-log: false
