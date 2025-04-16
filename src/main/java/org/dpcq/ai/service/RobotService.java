@@ -101,7 +101,7 @@ public class RobotService {
     public RobotEntity getFreeRobot(){
         Collection<String> activeUserIds = connectionManager.getActiveUserIds();
         return robotRepo.lambdaQuery().eq(RobotEntity::getStatus, 1)
-                .notIn(RobotEntity::getUserId,activeUserIds)
+                .notIn(!activeUserIds.isEmpty(),RobotEntity::getUserId,activeUserIds)
                 .last("limit 1").one();
     }
 
