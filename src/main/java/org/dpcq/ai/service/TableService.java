@@ -1,6 +1,7 @@
 package org.dpcq.ai.service;
 
 import com.dpcq.base.enums.SymbolEnum;
+import com.dpcq.base.utils.JsonUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dpcq.ai.entity.RobotEntity;
@@ -57,7 +58,7 @@ public class TableService {
 
     public long getRobotTable(){
         List<FreeTableVo> freeTableInfo = feignClubApi.getFreeTableInfo();
-        List<RobotEntity> robotList = robotRepo.lambdaQuery().eq(RobotEntity::getStatus, 1).list();
+        List<Long> robotList = robotRepo.lambdaQuery().eq(RobotEntity::getStatus, 1).list().stream().map(RobotEntity::getUserId).toList();
         if (freeTableInfo.isEmpty()){
             return 0;
         }

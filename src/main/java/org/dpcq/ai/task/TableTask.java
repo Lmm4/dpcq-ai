@@ -22,7 +22,7 @@ public class TableTask {
     private final TableService tableService;
     private final RobotService robotService;
     // 最少房间数
-    private final int minTableNum = 3;
+    private final int minTableNum = 2;
     private final FeignGameApi feignGameApi;
     /**
      * 定时创建牌桌

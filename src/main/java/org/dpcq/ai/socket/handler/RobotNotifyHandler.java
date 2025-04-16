@@ -71,24 +71,6 @@ public class RobotNotifyHandler implements MessageHandler{
             e.printStackTrace();
         }
     }
-
-    public static void main(String[] args) {
-        String content = "{\"id\":\"1147f52f-4571-4c72-b31a-a8c318e0b95a\",\"object\":\"chat.completion\",\"created\":1743493222,\"model\":\"deepseek-chat\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"```json\\n{\\\"call\\\":\\\"30\\\",\\\"fold\\\":\\\"70\\\",\\\"amount\\\":\\\"\\\",\\\"raise\\\":\\\"\\\",\\\"all_in\\\":\\\"\\\"}\\n```\"},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":233,\"completion_tokens\":24,\"total_tokens\":257,\"prompt_tokens_details\":{\"cached_tokens\":0},\"prompt_cache_hit_tokens\":0,\"prompt_cache_miss_tokens\":233},\"system_fingerprint\":\"fp_3d5141a69a_prod0225\"}";
-        V3Response parse = JsonUtils.parse(content, V3Response.class);
-        String json = MdToJsonUtil.convert(parse.getChoices().get(0).getMessage().getContent());
-        String json1 = "{\n" +
-                "\"call\":\"0%\",\n" +
-                "\"fold\":\"100%\",\n" +
-                "\"amount\":\"\",\n" +
-                "\"raise\":\"0%\",\n" +
-                "\"all_in\":\"0%\"\n" +
-                "}";
-        TableData data = new TableData();
-        data.setStage(Stage.PRE_FLOP.getStage());
-        ActionParams actionParams = null;
-//        dealJson(actionParams,json1,data);
-    }
-
     /**
      * 翻牌前处理（除激进外，对子）
      */

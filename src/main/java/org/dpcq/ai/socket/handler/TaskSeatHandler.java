@@ -6,13 +6,17 @@ import com.dpcq.base.utils.JsonUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dpcq.ai.enums.Ops;
+import org.dpcq.ai.pojo.Constants;
 import org.dpcq.ai.rpc.FeignWalletApi;
 import org.dpcq.ai.service.OpsService;
 import org.dpcq.ai.socket.SessionHandler;
 import org.dpcq.ai.socket.UserTableManager;
 import org.dpcq.ai.socket.handler.dto.SendMsg;
 import org.dpcq.ai.socket.handler.dto.resp.GameDataSyncDto;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
+
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Component
@@ -22,6 +26,7 @@ public class TaskSeatHandler implements MessageHandler{
     private final UserTableManager userTableManager;
     private final FeignWalletApi feignWalletApi;
     private final OpsService opsService;
+    private final StringRedisTemplate redisTemplate;
     @Override
     public String getHandlerType(String msg) {
         return Ops.TABLE_DATA_SYNC.name();
@@ -47,6 +52,8 @@ public class TaskSeatHandler implements MessageHandler{
         sessionHandler.sendMessage(JsonUtils.toJsonString(new SendMsg().setOps(Ops.ROBOT_TAKE_SEAT)));
         // 绑定牌桌
         userTableManager.bindTable(userId, dto.getTableConfig());
+        // 缓存机器人链接状态
+        redisTemplate.opsForValue().set(String.format(Constants.ROBOT_ONLINE_KEY, userId), JsonUtils.toJsonString(sessionHandler.getRobotInfo()), 3, TimeUnit.MINUTES);
     }
 
 }
