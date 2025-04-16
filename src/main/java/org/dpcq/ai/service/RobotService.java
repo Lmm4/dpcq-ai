@@ -21,7 +21,9 @@ import org.dpcq.ai.socket.handler.dto.RobotInfo;
 import org.dpcq.ai.util.ServletIpUtil;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 @Service
 @Slf4j
@@ -65,6 +67,7 @@ public class RobotService {
         if (connectionManager.isRobotInGame(robot.getUserId().toString())) {
             throw new RuntimeException("机器人已连接");
         }
+
         RobotInfo robotInfo = new RobotInfo();
         robotInfo.setSupplement(robot.isSupplement());
         robotInfo.setCharacterId(robot.getCharacters());
@@ -93,6 +96,16 @@ public class RobotService {
     }
 
     /**
+     * 获得空闲机器人
+     */
+    public RobotEntity getFreeRobot(){
+        Collection<String> activeUserIds = connectionManager.getActiveUserIds();
+        return robotRepo.lambdaQuery().eq(RobotEntity::getStatus, 1)
+                .notIn(RobotEntity::getUserId,activeUserIds)
+                .last("limit 1").one();
+    }
+
+    /**
      * 下一手离桌
      */
     public void leaveSeatNext(String userId){
@@ -100,6 +113,15 @@ public class RobotService {
         opsService.leaveSeatNext(userId, session);
     }
 
+    /**
+     * 空闲机器人列表
+     */
+    public List<RobotEntity> getFreeRobotList(){
+        Collection<String> activeUserIds = connectionManager.getActiveUserIds();
+        return robotRepo.lambdaQuery().eq(RobotEntity::getStatus, 1)
+                .notIn(RobotEntity::getUserId,activeUserIds)
+                .list();
+    }
 
 
     public String getV3Response(TableData data) throws Exception {

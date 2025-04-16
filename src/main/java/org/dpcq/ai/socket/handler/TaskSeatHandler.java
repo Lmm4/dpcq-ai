@@ -1,10 +1,13 @@
 package org.dpcq.ai.socket.handler;
 
 
+import com.dpcq.base.enums.SymbolEnum;
 import com.dpcq.base.utils.JsonUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dpcq.ai.enums.Ops;
+import org.dpcq.ai.rpc.FeignWalletApi;
+import org.dpcq.ai.service.OpsService;
 import org.dpcq.ai.socket.SessionHandler;
 import org.dpcq.ai.socket.UserTableManager;
 import org.dpcq.ai.socket.handler.dto.SendMsg;
@@ -17,6 +20,8 @@ import org.springframework.stereotype.Component;
 public class TaskSeatHandler implements MessageHandler{
 
     private final UserTableManager userTableManager;
+    private final FeignWalletApi feignWalletApi;
+    private final OpsService opsService;
     @Override
     public String getHandlerType(String msg) {
         return Ops.TABLE_DATA_SYNC.name();
@@ -29,6 +34,13 @@ public class TaskSeatHandler implements MessageHandler{
         if (dto.getSeats().stream().noneMatch(seat -> seat.getPlayer() == null) &&
             dto.getSeats().stream().anyMatch(seat -> seat.getPlayer().getId().toString().equals(userId))) {
             log.info("{}已在座位上",userId);
+            return;
+        }
+        // 查询余额是否满足最低带入
+        Long balance = feignWalletApi.getBalance(Long.valueOf(userId), SymbolEnum.DPCQ.getSymbol(), "USER");
+        if (dto.getTableConfig().getMinBring() > SymbolEnum.dpToBizDecimal(balance, SymbolEnum.DPCQ.getSymbol())){
+            log.info("{}余额不足，无法入座",userId);
+            opsService.cancelWatchTable(userId, sessionHandler);
             return;
         }
         // 未在座位上，执行入座

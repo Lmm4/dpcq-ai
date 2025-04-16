@@ -10,17 +10,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 
-@FeignClient(name = "club")
-public interface FeignClubApi {
+@FeignClient(name = "dp-game")
+public interface FeignGameApi {
 
-    @PostMapping("/internal/register/robot")
-    Long registerRobot(@RequestBody RobotRegParam body);
+    @GetMapping("/internal/tablesCanJoin")
+    List<Long> tablesCanJoin();
 
-    @PostMapping("/createTableByRobot")
-    Long createTableByRobot(@RequestBody RobotTableAddReqParam vo);
-    /**
-     * 查询进行中的机器人牌桌列表
-     */
-    @GetMapping("/internal/getFreeTableInfo")
-    List<FreeTableVo> getFreeTableInfo();
 }

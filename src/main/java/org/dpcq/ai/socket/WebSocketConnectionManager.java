@@ -9,6 +9,7 @@ import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.client.WebSocketClient;
 
 import java.net.URI;
+import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -34,6 +35,10 @@ public class WebSocketConnectionManager {
 
     public SessionHandler getSessionByUserId(String userId) {
         return sessions.get(userId);
+    }
+
+    public Collection<String> getActiveUserIds() {
+        return sessions.keySet();
     }
 
     public CompletableFuture<String> createConnection(RobotInfo robotInfo) {
