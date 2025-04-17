@@ -28,7 +28,7 @@ public class TableTask {
      * 定时创建牌桌
      * 每次创建牌局的时候，需要保证机器人是房主的牌局要有最少10个，如果少于10个，需要在随机挑选一个机器人主动创建牌局，创建后自动加入自己创建的房间
      */
-    @Scheduled(fixedDelay = 1000 * 60 * 1)
+    @Scheduled(initialDelay = 1000 * 5 , fixedDelay = 1000 * 60 * 1)
     public void createTable(){
         long num = tableService.getRobotTable();
         if (num < minTableNum){
@@ -50,7 +50,7 @@ public class TableTask {
      *      1、牌局总人数：7人以上（机器人不做处理）
      *      2、符合以上要求后，判断真人数量  <=6  如果是（机器人加入 1个）如果不是（不处理）
      */
-//    @Scheduled(fixedDelay = 1000 * 60 * 3)
+    @Scheduled(initialDelay = 1000 * 10 , fixedDelay = 1000 * 60 * 3)
     public void joinTable(){
         List<RobotEntity> freeRobotList = robotService.getFreeRobotList();
         if (freeRobotList.isEmpty()){

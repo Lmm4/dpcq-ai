@@ -29,7 +29,7 @@ public class InitTask implements CommandLineRunner {
                 String info = redisTemplate.opsForValue().get(key);
                 RobotInfo robotInfo = JsonUtils.parse(info, RobotInfo.class);
                 webSocketConnectionManager.createConnection(robotInfo);
-                log.info("机器人重连{}加入牌桌{}", userId, robotInfo.getUserId());
+                log.info("机器人重连{}加入牌桌{}", userId, robotInfo.getTableId());
             });
         }
         log.info("init task end");
