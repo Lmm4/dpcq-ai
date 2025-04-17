@@ -5,18 +5,23 @@ import com.dpcq.base.utils.JsonUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dpcq.ai.enums.Ops;
+import org.dpcq.ai.pojo.Constants;
 import org.dpcq.ai.socket.SessionHandler;
 import org.dpcq.ai.socket.UserTableManager;
 import org.dpcq.ai.socket.handler.dto.req.GameBringInParams;
 import org.dpcq.ai.socket.handler.dto.req.LeaveSeatParams;
 import org.dpcq.ai.socket.handler.dto.resp.GameDataSyncDto;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class OpsService {
     private final UserTableManager userTableManager;
+    private final StringRedisTemplate redisTemplate;
 
     /**
      * 离桌
@@ -38,6 +43,8 @@ public class OpsService {
         params.setUserId(Long.valueOf(userId));
         sessionHandler.sendMessage(JsonUtils.toJsonString(params));
         sessionHandler.close();
+        // 缓存机器人链接状态
+        redisTemplate.delete(String.format(Constants.ROBOT_ONLINE_KEY, userId));
     }
 
     /**

@@ -53,7 +53,7 @@ public class TaskSeatHandler implements MessageHandler{
         // 绑定牌桌
         userTableManager.bindTable(userId, dto.getTableConfig());
         // 缓存机器人链接状态
-        redisTemplate.opsForValue().set(String.format(Constants.ROBOT_ONLINE_KEY, userId), JsonUtils.toJsonString(sessionHandler.getRobotInfo()), 3, TimeUnit.MINUTES);
+        redisTemplate.opsForValue().set(String.format(Constants.ROBOT_ONLINE_KEY, userId), JsonUtils.toJsonString(sessionHandler.getRobotInfo()));
     }
 
 }
