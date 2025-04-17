@@ -16,6 +16,7 @@ import org.dpcq.ai.socket.handler.dto.resp.GameDataSyncDto;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -36,9 +37,13 @@ public class TaskSeatHandler implements MessageHandler{
     public void handle(String userId, String msg, SessionHandler sessionHandler) {
         GameDataSyncDto dto = JsonUtils.parse(msg, GameDataSyncDto.class);
         // 在座上则跳过
-        if (dto.getSeats().stream().noneMatch(seat -> seat.getPlayer() == null) &&
-            dto.getSeats().stream().anyMatch(seat -> seat.getPlayer().getId().toString().equals(userId))) {
+        if (dto.getSeats().stream().anyMatch(seat -> seat.getPlayer().getId().toString().equals(userId))) {
             log.info("{}已在座位上",userId);
+            return;
+        }
+        // 没有空位跳过
+        if (dto.getSeats().stream().noneMatch(seat -> Objects.isNull(seat.getPlayer()))) {
+            log.info("{}座位已满",dto.getTableConfig().getId().toString());
             return;
         }
         // 查询余额是否满足最低带入
