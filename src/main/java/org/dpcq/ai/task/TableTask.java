@@ -22,13 +22,13 @@ public class TableTask {
     private final TableService tableService;
     private final RobotService robotService;
     // 最少房间数
-    private final int minTableNum = 2;
+    private final int minTableNum = 1;
     private final FeignGameApi feignGameApi;
     /**
      * 定时创建牌桌
      * 每次创建牌局的时候，需要保证机器人是房主的牌局要有最少10个，如果少于10个，需要在随机挑选一个机器人主动创建牌局，创建后自动加入自己创建的房间
      */
-    @Scheduled(initialDelay = 1000 * 5 , fixedDelay = 1000 * 60 * 1)
+    @Scheduled(initialDelay = 1000 * 5 , fixedDelay = 1000 * 60 * 2)
     public void createTable(){
         long num = tableService.getRobotTable();
         if (num < minTableNum){

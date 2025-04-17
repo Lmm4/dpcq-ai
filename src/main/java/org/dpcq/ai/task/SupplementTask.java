@@ -28,7 +28,7 @@ public class SupplementTask {
     // 余额标准
     private final BigDecimal balanceStandard = new BigDecimal(2000);
 
-//    @Scheduled(fixedDelay = 1000 * 60 * 2)
+    @Scheduled(initialDelay = 1000 * 60 , fixedDelay = 1000 * 60 * 2)
     public void supplement() {
         log.info("=====================开始补充筹码=======================");
         List<Long> userIds = robotService.getFreeRobotList().stream().map(RobotEntity::getUserId).toList();
