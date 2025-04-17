@@ -37,7 +37,7 @@ public class TaskSeatHandler implements MessageHandler{
     public void handle(String userId, String msg, SessionHandler sessionHandler) {
         GameDataSyncDto dto = JsonUtils.parse(msg, GameDataSyncDto.class);
         // 在座上则跳过
-        if (dto.getSeats().stream().anyMatch(seat -> seat.getPlayer().getId().toString().equals(userId))) {
+        if (dto.getSeats().stream().anyMatch(seat -> Objects.nonNull(seat.getPlayer()) && seat.getPlayer().getId().toString().equals(userId))) {
             log.info("{}已在座位上",userId);
             return;
         }
