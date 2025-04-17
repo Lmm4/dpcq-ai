@@ -62,12 +62,11 @@ public class TableTask {
         }
         int index = tableIds.size() - 1;
         for (RobotEntity robotEntity : freeRobotList) {
-            Long robotUserId = robotEntity.getUserId();
             if (index < 0){
                 break;
             }
             Long tableId = tableIds.get(index);
-            robotService.connectGame(new RobotConnectParam().setRobotId(robotUserId).setTableId(tableId));
+            robotService.connectGame(new RobotConnectParam().setRobotId(robotEntity.getId()).setTableId(tableId));
             index --;
         }
     }
