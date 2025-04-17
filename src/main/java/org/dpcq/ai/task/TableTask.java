@@ -1,5 +1,6 @@
 package org.dpcq.ai.task;
 
+import com.alibaba.nacos.common.utils.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dpcq.ai.entity.RobotEntity;
@@ -7,6 +8,7 @@ import org.dpcq.ai.pojo.req.RobotConnectParam;
 import org.dpcq.ai.rpc.FeignGameApi;
 import org.dpcq.ai.service.RobotService;
 import org.dpcq.ai.service.TableService;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -24,12 +26,17 @@ public class TableTask {
     // 最少房间数
     private final int minTableNum = 1;
     private final FeignGameApi feignGameApi;
+    private final StringRedisTemplate redisTemplate;
+
     /**
      * 定时创建牌桌
      * 每次创建牌局的时候，需要保证机器人是房主的牌局要有最少10个，如果少于10个，需要在随机挑选一个机器人主动创建牌局，创建后自动加入自己创建的房间
      */
     @Scheduled(initialDelay = 1000 * 5 , fixedDelay = 1000 * 60 * 2)
     public void createTable(){
+        if (isStopRobot()){
+            return;
+        }
         long num = tableService.getRobotTable();
         if (num < minTableNum){
             RobotEntity freeRobot = robotService.getFreeRobot();
@@ -52,6 +59,9 @@ public class TableTask {
      */
     @Scheduled(initialDelay = 1000 * 10 , fixedDelay = 1000 * 60 * 3)
     public void joinTable(){
+        if (isStopRobot()){
+            return;
+        }
         List<RobotEntity> freeRobotList = robotService.getFreeRobotList();
         if (freeRobotList.isEmpty()){
             return;
@@ -69,5 +79,10 @@ public class TableTask {
             robotService.connectGame(new RobotConnectParam().setRobotId(robotEntity.getId()).setTableId(tableId));
             index --;
         }
+    }
+
+    private boolean isStopRobot(){
+        String s = redisTemplate.opsForValue().get("robot_switch");
+        return StringUtils.isBlank(s) || !Boolean.parseBoolean(s);
     }
 }
