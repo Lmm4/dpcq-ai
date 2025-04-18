@@ -70,8 +70,8 @@ ai:
     gemini:
       url: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=
       key:
-#        - AIzaSyDaA2VMTww4LnVGO59CzbKR7iDURpLTXh4
-#        - AIzaSyAR_c9VH-YwXxlX3FYKBN4IR8GnLxph1xc
+        - AIzaSyDaA2VMTww4LnVGO59CzbKR7iDURpLTXh4
+        - AIzaSyAR_c9VH-YwXxlX3FYKBN4IR8GnLxph1xc
         - AIzaSyB3G0ymu-tFwaNNLHSafH-YU66XwEVC_fM
         - AIzaSyDGPZQ8LuJCgKuqwZ2xGr7sqK8bxRGF0Qo
 ws:
