@@ -1,6 +1,7 @@
 package org.dpcq.ai.service;
 
 import cn.hutool.core.lang.UUID;
+import com.dpcq.base.utils.JsonUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -129,6 +130,12 @@ public class RobotService {
                 .list();
     }
 
+    /**
+     * 查询机器人连接情况
+     */
+    public String getRobotList(){
+        return JsonUtils.toJsonString(connectionManager.getActiveSessionHandlers());
+    }
 
     public String getV3Response(TableData data) throws Exception {
         return deepSeekV3ApiModel.getResponse("",PromptGenerator.getUserContent(data));

@@ -41,6 +41,10 @@ public class WebSocketConnectionManager {
         return sessions.keySet();
     }
 
+    public Collection<SessionHandler> getActiveSessionHandlers() {
+        return sessions.values();
+    }
+
     public CompletableFuture<String> createConnection(RobotInfo robotInfo) {
         String userId = robotInfo.getUserId();
         String tableId = robotInfo.getTableId();
