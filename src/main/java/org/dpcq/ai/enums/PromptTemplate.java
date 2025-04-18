@@ -11,6 +11,7 @@ public enum PromptTemplate {
     HAND_CARDS("你的手牌是%s"),
     PUB_CARDS("公牌是%s"),
     QUESTION("结合以上信息经过分析后,你会选择的操作的百分比各是多少,不返回分析过程,只返回这个模板的json:%s。"),
+    PRE_FLOP("翻牌前谨慎弃牌"),
     AMOUNT("amount字段为加注的筹码数，不能为0。"),
     ;
 
