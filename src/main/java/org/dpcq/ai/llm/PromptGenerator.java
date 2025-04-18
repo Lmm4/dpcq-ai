@@ -48,6 +48,9 @@ public class PromptGenerator {
         // 剩下操作
         String json = GameProcessEvent.getUserEvent(data.getMinBet(), data.getChips());
         prompt.append(PromptTemplate.QUESTION.format(GameProcessEvent.getUserEvent(data.getMinBet(), data.getChips())));
+        if (data.getStage().equals(Stage.PRE_FLOP.getStage())){
+            prompt.append(PromptTemplate.PRE_FLOP.getPattern());
+        }
         if (json.contains("amount")){
             prompt.append(PromptTemplate.AMOUNT.getPattern());
         }
