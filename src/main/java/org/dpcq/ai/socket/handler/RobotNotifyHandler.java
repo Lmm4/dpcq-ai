@@ -13,11 +13,9 @@ import org.dpcq.ai.enums.Ops;
 import org.dpcq.ai.enums.Stage;
 import org.dpcq.ai.llm.LLMSelector;
 import org.dpcq.ai.llm.dto.TableData;
-import org.dpcq.ai.llm.dto.V3Response;
 import org.dpcq.ai.pojo.Constants;
 import org.dpcq.ai.socket.SessionHandler;
 import org.dpcq.ai.socket.handler.dto.req.ActionParams;
-import org.dpcq.ai.util.MdToJsonUtil;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
@@ -135,12 +133,15 @@ public class RobotNotifyHandler implements MessageHandler{
             Map<String, Double> fields = new LinkedHashMap<>();
             rootNode.fields().forEachRemaining(entry -> {
                 JsonNode valueNode = entry.getValue();
+                double value ;
                 if (valueNode.asText().contains("%")){
                     String text = valueNode.asText();
-                    Double value = Double.valueOf(text.replace("%", ""));
-                    fields.put(entry.getKey(), value);
+                    value = Double.parseDouble(text.replace("%", ""));
                 }else {
-                    fields.put(entry.getKey(), valueNode.asDouble());
+                    value = valueNode.asDouble();
+                }
+                if (value > 10){
+                    fields.put(entry.getKey(), value);
                 }
             });
             double total = fields.values().stream().mapToDouble(Double::doubleValue).sum();
