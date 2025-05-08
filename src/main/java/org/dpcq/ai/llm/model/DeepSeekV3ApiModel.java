@@ -72,6 +72,6 @@ public class DeepSeekV3ApiModel implements LLMStrategy {
 
     @Override
     public int getWeight() {
-        return 6;
+        return 8;
     }
 }

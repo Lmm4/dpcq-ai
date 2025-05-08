@@ -1,7 +1,6 @@
 package org.dpcq.ai.service;
 
 import com.dpcq.base.enums.SymbolEnum;
-import com.dpcq.base.utils.JsonUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dpcq.ai.entity.RobotEntity;
@@ -9,7 +8,6 @@ import org.dpcq.ai.repo.impl.RobotRepo;
 import org.dpcq.ai.rpc.FeignClubApi;
 import org.dpcq.ai.rpc.dto.FreeTableVo;
 import org.dpcq.ai.rpc.dto.RobotTableAddReqParam;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -77,8 +75,8 @@ public class TableService {
         param.setPwd("");
         param.setBig(blind.get("big")); //大盲
         param.setSmall(blind.get("small"));//小盲
-        param.setBringUpper(blind.get("big") * 150);//最大带入
-        param.setBringLower(blind.get("small") * 20);//最小带入
+        param.setBringUpper(150L);//最大带入
+        param.setBringLower(20L);//最小带入
         param.setGameDuration(getGameDuration());//牌局时间
         param.setType("classic_texas");
         param.setCurrencyType(SymbolEnum.DPCQ.getSymbol());

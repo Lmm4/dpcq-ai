@@ -73,6 +73,6 @@ public class GeminiModel implements LLMStrategy {
 
     @Override
     public int getWeight() {
-        return 4;
+        return 2;
     }
 }
