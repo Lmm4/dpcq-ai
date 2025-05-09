@@ -41,17 +41,20 @@ public class RobotService {
     /**
      * 创建机器人
      */
-    public boolean createRobot(HttpServletRequest request){
+    public boolean createRobot(Integer number,HttpServletRequest request){
         RobotRegParam form = new RobotRegParam();
-        form.setUsername("robot" + System.currentTimeMillis());
-        form.setPassword(UUID.fastUUID().toString(true).substring(0,14));
         form.setIp(ServletIpUtil.getClientIP(request));
-        Long userId = feignUserApi.registerRobot(form);
-        robotRepo.save(RobotEntity.builder()
-                        .characters(RobotCharacter.getRandomRobotCharacter())
-                        .userId(userId)
-                        .status(1)
-                        .build());
+        for (int i = 0; i < number; i++) {
+            form.setUsername("robot" + System.currentTimeMillis()/1000);
+            form.setPassword(UUID.fastUUID().toString(true).substring(0,14));
+            Long userId = feignUserApi.registerRobot(form);
+            robotRepo.save(RobotEntity.builder()
+                    .characters(RobotCharacter.getRandomRobotCharacter())
+                    .userId(userId)
+                    .status(1)
+                    .build());
+            log.info("创建机器人成功,userId:{},password:{}",userId,form.getPassword());
+        }
         return true;
     }
 

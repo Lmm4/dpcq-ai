@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 @FeignClient(name = "user")
 public interface FeignUserApi {
 
-    @PostMapping("register/robot")
+    @PostMapping("/internal/register/robot")
     Long registerRobot(@RequestBody RobotRegParam body);
 
 }

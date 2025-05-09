@@ -19,9 +19,10 @@ public class AdminRobotController {
     /**
      * 新建机器人
      */
-    @PostMapping("create")
-    public Boolean createRobot(HttpServletRequest request) {
-        return robotService.createRobot(request);
+    @GetMapping("create")
+    @AnonymousAccess
+    public Boolean createRobot(@RequestParam(defaultValue = "1") Integer number ,HttpServletRequest request) {
+        return robotService.createRobot(number, request);
     }
 
     /**
