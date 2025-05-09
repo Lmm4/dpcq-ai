@@ -1,6 +1,7 @@
 package org.dpcq.ai.service;
 
 import cn.hutool.core.lang.UUID;
+import cn.hutool.core.util.RandomUtil;
 import com.dpcq.base.utils.JsonUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -45,7 +46,7 @@ public class RobotService {
         RobotRegParam form = new RobotRegParam();
         form.setIp(ServletIpUtil.getClientIP(request));
         for (int i = 0; i < number; i++) {
-            form.setUsername("robot" + System.currentTimeMillis()/1000);
+            form.setUsername("T-" + RandomUtil.randomInt(1,9999));
             form.setPassword(UUID.fastUUID().toString(true).substring(0,14));
             Long userId = feignUserApi.registerRobot(form);
             robotRepo.save(RobotEntity.builder()
