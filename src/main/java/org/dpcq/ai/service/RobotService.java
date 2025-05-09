@@ -2,6 +2,7 @@ package org.dpcq.ai.service;
 
 import cn.hutool.core.lang.UUID;
 import cn.hutool.core.util.RandomUtil;
+import com.dpcq.base.enums.SymbolEnum;
 import com.dpcq.base.utils.JsonUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ import org.dpcq.ai.llm.model.GemmaOllamaModel;
 import org.dpcq.ai.pojo.req.RobotConnectParam;
 import org.dpcq.ai.repo.IRobotRepo;
 import org.dpcq.ai.rpc.FeignUserApi;
+import org.dpcq.ai.rpc.FeignWalletApi;
 import org.dpcq.ai.rpc.dto.RobotRegParam;
 import org.dpcq.ai.socket.SessionHandler;
 import org.dpcq.ai.socket.WebSocketConnectionManager;
@@ -33,6 +35,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RobotService {
     private final FeignUserApi feignUserApi;
+    private final FeignWalletApi feignWalletApi;
     private final DeepSeekV3ApiModel deepSeekV3ApiModel;
     private final GemmaOllamaModel gemmaOllamaModel;
     private final IRobotRepo robotRepo;
@@ -54,6 +57,7 @@ public class RobotService {
                     .userId(userId)
                     .status(1)
                     .build());
+            Long balance = feignWalletApi.getBalance(userId, SymbolEnum.DPCQ.getSymbol(), "USER");
             log.info("创建机器人成功,userId:{},password:{}",userId,form.getPassword());
         }
         return true;

@@ -61,7 +61,7 @@ public class GeminiModel implements LLMStrategy {
         try {
             okhttp3.Response response = client.newCall(request).execute();
             String responseBody = response.body().string();
-            log.info("GEMINI-API响应结果：{}", responseBody);
+//            log.info("GEMINI-API响应结果：{}", responseBody);
             GeminiResponse parse = JsonUtils.parse(responseBody, GeminiResponse.class);
             return MdToJsonUtil.convert(parse.getCandidates().get(0).getContent().getParts().get(0).getText());
         } catch (Exception e) {
