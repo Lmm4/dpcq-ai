@@ -1,6 +1,5 @@
 package org.dpcq.ai.llm.model;
 
-
 import com.dpcq.base.utils.JsonUtils;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.MediaType;
@@ -9,9 +8,11 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import org.dpcq.ai.config.AiConfig;
 import org.dpcq.ai.enums.LLMType;
+import org.dpcq.ai.enums.V3Role;
 import org.dpcq.ai.llm.LLMStrategy;
-import org.dpcq.ai.llm.dto.GeminiReqParam;
-import org.dpcq.ai.llm.dto.GeminiResponse;
+import org.dpcq.ai.llm.dto.V3Message;
+import org.dpcq.ai.llm.dto.V3ReqParam;
+import org.dpcq.ai.llm.dto.V3Response;
 import org.dpcq.ai.util.MdToJsonUtil;
 import org.springframework.stereotype.Component;
 
@@ -20,24 +21,21 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
 @Slf4j
-public class GeminiModel implements LLMStrategy {
+public class QianwenModel implements LLMStrategy {
     private final AiConfig aiConfig;
     // 密钥列表
     private final List<String> apiKeys;
     private final AtomicInteger currentKeyIndex = new AtomicInteger(0);
 
-    public GeminiModel(AiConfig aiConfig) {
+    public QianwenModel(AiConfig aiConfig) {
         this.aiConfig = aiConfig;
-        this.apiKeys = aiConfig.getApi().getGemini().getKey();
+        this.apiKeys = aiConfig.getApi().getQwen().getKey();
     }
-
     // 轮询获取密钥
     private String getNextApiKey() {
         int index = currentKeyIndex.getAndUpdate(i -> (i + 1) % apiKeys.size());
         return apiKeys.get(index);
     }
-
-
     @Override
     public boolean isEnabled() {
         return false;
@@ -45,27 +43,28 @@ public class GeminiModel implements LLMStrategy {
 
     @Override
     public LLMType getType() {
-        return LLMType.GEMINI;
+        return LLMType.QWEN;
     }
 
     @Override
-    public String getResponse(String systemContent, String userContent) {
-        GeminiReqParam param = GeminiReqParam.getParam(systemContent + userContent);
-        String url = aiConfig.getApi().getGemini().getUrl() + getNextApiKey();
+    public String getResponse(String systemContent,String userContent) {
+        List<V3Message> v3Messages = List.of(new V3Message(V3Role.system.name(), systemContent), new V3Message(V3Role.user.name(), userContent));
+        V3ReqParam requestMsg = new V3ReqParam(v3Messages, "qwen-max", false);
 
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder()
-                .url(url)
-                .post(RequestBody.create(JsonUtils.toJsonString(param), MediaType.parse("application/json")))
+                .url(aiConfig.getApi().getQwen().getUrl())
+                .post(RequestBody.create(JsonUtils.toJsonString(requestMsg), MediaType.parse("application/json")))
+                .addHeader("Authorization", "Bearer " + getNextApiKey())
                 .build();
         try {
             okhttp3.Response response = client.newCall(request).execute();
             String responseBody = response.body().string();
-//            log.info("GEMINI-API响应结果：{}", responseBody);
-            GeminiResponse parse = JsonUtils.parse(responseBody, GeminiResponse.class);
-            return MdToJsonUtil.convert(parse.getCandidates().get(0).getContent().getParts().get(0).getText());
+            log.info("QWEN-API响应结果：{}", responseBody);
+            V3Response parse = JsonUtils.parse(responseBody, V3Response.class);
+            return MdToJsonUtil.convert(parse.getChoices().get(0).getMessage().getContent());
         } catch (Exception e) {
-            log.error("GEMINI error", e);
+            log.error("QWEN error", e);
             e.printStackTrace();
             return "";
         }
@@ -73,6 +72,6 @@ public class GeminiModel implements LLMStrategy {
 
     @Override
     public int getWeight() {
-        return 2;
+        return 3;
     }
 }

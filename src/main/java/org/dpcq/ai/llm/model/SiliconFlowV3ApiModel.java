@@ -39,7 +39,7 @@ public class SiliconFlowV3ApiModel implements LLMStrategy {
     }
     @Override
     public boolean isEnabled() {
-        return true;
+        return false;
     }
 
     @Override

@@ -9,6 +9,7 @@ import org.dpcq.ai.rpc.dto.UserBalanceVo;
 import org.dpcq.ai.rpc.dto.WalletMsg;
 import org.dpcq.ai.rpc.dto.WalletResponse;
 import org.dpcq.ai.service.RobotService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -27,9 +28,14 @@ public class SupplementTask {
     private final FeignWalletApi feignWalletApi;
     // 余额标准
     private final BigDecimal balanceStandard = new BigDecimal(2000);
+    @Value("${spring.profiles.active}")
+    private String profile;
 
     @Scheduled(initialDelay = 1000 * 60 , fixedDelay = 1000 * 60 * 2)
     public void supplement() {
+        if ("local".equals(profile)) {
+            return;
+        }
         List<Long> userIds = robotService.getFreeRobotList().stream().map(RobotEntity::getUserId).toList();
         if (userIds.isEmpty()) {
             return;

@@ -8,4 +8,5 @@ public enum LLMType {
     GEMMA,
     SILICONFLOW,
     GEMINI,
+    QWEN,
 }

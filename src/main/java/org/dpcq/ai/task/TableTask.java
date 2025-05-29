@@ -8,6 +8,7 @@ import org.dpcq.ai.pojo.req.RobotConnectParam;
 import org.dpcq.ai.rpc.FeignGameApi;
 import org.dpcq.ai.service.RobotService;
 import org.dpcq.ai.service.TableService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -27,14 +28,15 @@ public class TableTask {
     private final int minTableNum = 1;
     private final FeignGameApi feignGameApi;
     private final StringRedisTemplate redisTemplate;
-
+    @Value("${spring.profiles.active}")
+    private String profile;
     /**
      * 定时创建牌桌
      * 每次创建牌局的时候，需要保证机器人是房主的牌局要有最少10个，如果少于10个，需要在随机挑选一个机器人主动创建牌局，创建后自动加入自己创建的房间
      */
     @Scheduled(initialDelay = 1000 * 5 , fixedDelay = 1000 * 60 * 2)
     public void createTable(){
-        if (isStopRobot()){
+        if (isStopRobot() || "local".equals(profile)){
             return;
         }
         long num = tableService.getRobotTable();
@@ -59,7 +61,7 @@ public class TableTask {
      */
     @Scheduled(initialDelay = 1000 * 10 , fixedDelay = 1000 * 60 * 3)
     public void joinTable(){
-        if (isStopRobot()){
+        if (isStopRobot() || "local".equals(profile)){
             return;
         }
         List<RobotEntity> freeRobotList = robotService.getFreeRobotList();

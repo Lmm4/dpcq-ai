@@ -31,6 +31,7 @@ public class AiConfig {
         private ApiProvider deepseek;
         private ApiProvider siliconflow;
         private ApiProvider gemini;
+        private ApiProvider qwen;
 
         @Data
         public static class ApiProvider {

@@ -53,7 +53,7 @@ public class DeepSeekV3ApiModel implements LLMStrategy {
 
     @Override
     public String getResponse(String systemContent, String userContent) throws Exception{
-//        log.info("调用DEEPSEEK-API请求内容：{},{}", systemContent, userContent);
+        log.info("调用DEEPSEEK-API请求内容：{},{}", systemContent, userContent);
         List<V3Message> v3Messages = List.of(new V3Message(V3Role.system.name(), systemContent), new V3Message(V3Role.user.name(), userContent));
         V3ReqParam requestMsg = new V3ReqParam(v3Messages, "deepseek-chat", false);
 
@@ -65,13 +65,13 @@ public class DeepSeekV3ApiModel implements LLMStrategy {
                 .build();
         okhttp3.Response response = client.newCall(request).execute();
         String responseBody = response.body().string();
-//        log.info("调用DEEPSEEK-API响应结果：{}", responseBody);
+        log.info("调用DEEPSEEK-API响应结果：{}", responseBody);
         V3Response parse = JsonUtils.parse(responseBody, V3Response.class);
         return MdToJsonUtil.convert(parse.getChoices().get(0).getMessage().getContent());
     }
 
     @Override
     public int getWeight() {
-        return 8;
+        return 7;
     }
 }

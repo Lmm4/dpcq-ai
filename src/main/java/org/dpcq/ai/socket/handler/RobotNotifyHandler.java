@@ -140,7 +140,7 @@ public class RobotNotifyHandler implements MessageHandler{
                 }else {
                     value = valueNode.asDouble();
                 }
-                if (value > 10){
+                if (value > 30){
                     fields.put(entry.getKey(), value);
                 }
             });
