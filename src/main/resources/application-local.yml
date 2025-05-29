@@ -4,11 +4,11 @@ spring:
       discovery:
         group: ${spring.profiles.active}
         namespace: ${spring.profiles.active}
-        server-addr: 13.214.141.254:8848
+        server-addr: 13.214.141.254
   datasource:
     username: root
-    password: bu1myXupteiwHC1jT3hp
-    url: jdbc:mariadb://13.214.141.254:3306/dpcq?serverTimezone=Asia/Shanghai
+    password: dpcq
+    url: jdbc:mariadb://127.0.0.1:3306/dpcq?serverTimezone=Asia/Shanghai
     driver-class-name: org.mariadb.jdbc.Driver
 
   data:
@@ -74,6 +74,11 @@ ai:
 #        - AIzaSyAR_c9VH-YwXxlX3FYKBN4IR8GnLxph1xc
         - AIzaSyB3G0ymu-tFwaNNLHSafH-YU66XwEVC_fM
         - AIzaSyDGPZQ8LuJCgKuqwZ2xGr7sqK8bxRGF0Qo
+    qwen:
+      url: https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions
+      key:
+        - sk-517f6193df7148099c77b6837ee78f64
+        - sk-405a49c62399405eb20a684b658c0d4f
 ws:
   service:
 #    url: ws://13.212.100.218:9006/ws/
