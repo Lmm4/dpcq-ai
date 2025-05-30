@@ -13,6 +13,7 @@ public enum PromptTemplate {
     QUESTION("结合以上信息经过分析后,你会选择的操作的百分比各是多少,%s不返回分析过程,只返回这个模板的json:%s。"),
     PRE_FLOP("尽量不弃牌,"),
     AMOUNT("amount字段为加注的筹码数，不能为0。"),
+    EXTRA("如果最大牌型能组成顺子、四条、同花、同花顺、葫芦其中之一，不选择弃牌"),
     ;
 
     private final String pattern;

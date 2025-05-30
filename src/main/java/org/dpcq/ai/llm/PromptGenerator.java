@@ -51,6 +51,10 @@ public class PromptGenerator {
         if (json.contains("amount")){
             prompt.append(PromptTemplate.AMOUNT.getPattern());
         }
+        // 河牌圈牌型判断
+        if (data.getStage().equals(Stage.RIVER.getStage())){
+            prompt.append(PromptTemplate.EXTRA.getPattern());
+        }
         return prompt.toString();
     }
 
