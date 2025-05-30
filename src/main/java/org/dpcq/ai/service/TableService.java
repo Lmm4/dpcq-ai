@@ -5,11 +5,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dpcq.ai.entity.RobotEntity;
 import org.dpcq.ai.repo.impl.RobotRepo;
-import org.dpcq.ai.rpc.FeignClubApi;
 import org.dpcq.ai.rpc.dto.FreeTableVo;
 import org.dpcq.ai.rpc.dto.RobotTableAddReqParam;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -51,11 +51,11 @@ public class TableService {
      2、机器人配踢出牌局，进入闲置状态，并补充筹码。机器人的初始筹码为：2000
      */
     private final RobotRepo robotRepo;
-    private final FeignClubApi feignClubApi;
     Random random = new Random();
 
     public long getRobotTable(){
-        List<FreeTableVo> freeTableInfo = feignClubApi.getFreeTableInfo();
+//        List<FreeTableVo> freeTableInfo = feignClubApi.getFreeTableInfo();
+        List<FreeTableVo> freeTableInfo = new ArrayList<>();
         List<Long> robotList = robotRepo.lambdaQuery().eq(RobotEntity::getStatus, 1).list().stream().map(RobotEntity::getUserId).toList();
         if (freeTableInfo.isEmpty()){
             return 0;
@@ -64,7 +64,8 @@ public class TableService {
     }
 
     public Long createTableByRobot(Long userId) {
-        return feignClubApi.createTableByRobot(generalTable(userId));
+        return 0L;
+//        return feignClubApi.createTableByRobot(generalTable(userId));
     }
 
     private RobotTableAddReqParam generalTable(Long userId) {

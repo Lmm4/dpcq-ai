@@ -7,16 +7,16 @@ spring:
         server-addr: 13.214.141.254
   datasource:
     username: root
-    password: dpcq
-    url: jdbc:mariadb://127.0.0.1:3306/dpcq?serverTimezone=Asia/Shanghai
+    password: bu1myXupteiwHC1jT3hp
+    url: jdbc:mariadb://13.214.141.254:3306/open-client-web?serverTimezone=Asia/Shanghai
     driver-class-name: org.mariadb.jdbc.Driver
 
   data:
     redis:
-      host: 127.0.0.1
-      port: 6379
-#      password: aaawobuxiangnuliliao
-      database: 0
+      host: 13.214.141.254
+      port: 6380
+      password: aaawobuxiangnuliliao
+      database: 2
 
   kafka:
     bootstrap-servers: 13.212.100.218:9092 #
@@ -82,7 +82,7 @@ ai:
 ws:
   service:
 #    url: ws://13.212.100.218:9006/ws/
-    url: wss://ws.dpcq.club/ws/
+    url: wss://test-tgh5.dpcq.work/api/ws/
 
 robot:
   send-log: true

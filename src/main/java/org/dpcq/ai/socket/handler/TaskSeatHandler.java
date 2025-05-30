@@ -7,8 +7,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dpcq.ai.enums.Ops;
 import org.dpcq.ai.pojo.Constants;
-import org.dpcq.ai.rpc.FeignWalletApi;
 import org.dpcq.ai.service.OpsService;
+import org.dpcq.ai.service.WalletService;
 import org.dpcq.ai.socket.SessionHandler;
 import org.dpcq.ai.socket.UserTableManager;
 import org.dpcq.ai.socket.handler.dto.SendMsg;
@@ -17,8 +17,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Component
@@ -26,9 +26,9 @@ import java.util.concurrent.TimeUnit;
 public class TaskSeatHandler implements MessageHandler{
 
     private final UserTableManager userTableManager;
-    private final FeignWalletApi feignWalletApi;
     private final OpsService opsService;
     private final StringRedisTemplate redisTemplate;
+    private final WalletService walletService;
     @Value("${spring.profiles.active}")
     private String profile;
     @Override
@@ -51,8 +51,8 @@ public class TaskSeatHandler implements MessageHandler{
         }
         // 查询余额是否满足最低带入
         if (!"local".equals(profile)){
-            Long balance = feignWalletApi.getBalance(Long.valueOf(userId), SymbolEnum.DPCQ.getSymbol(), "USER");
-            if (dto.getTableConfig().getMinBring() > SymbolEnum.dpToBizDecimal(balance, SymbolEnum.DPCQ.getSymbol())){
+            BigDecimal balance = walletService.get(userId);
+            if (dto.getTableConfig().getMinBring() > SymbolEnum.convertLongBiz(balance, SymbolEnum.DPCQ.getSymbol())){
                 log.info("{}余额不足，无法入座",userId);
                 opsService.cancelWatchTable(userId, sessionHandler);
                 return;

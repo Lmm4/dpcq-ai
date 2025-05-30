@@ -21,8 +21,8 @@ public class AdminRobotController {
      */
     @GetMapping("create")
     @AnonymousAccess
-    public Boolean createRobot(@RequestParam(defaultValue = "1") Integer number ,HttpServletRequest request) {
-        return robotService.createRobot(number, request);
+    public Boolean createRobot(@RequestParam String name) {
+        return robotService.createRobot(name);
     }
 
     /**

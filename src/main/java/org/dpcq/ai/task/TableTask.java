@@ -1,11 +1,12 @@
 package org.dpcq.ai.task;
 
+import cn.hutool.http.HttpUtil;
 import com.alibaba.nacos.common.utils.StringUtils;
+import com.dpcq.base.utils.JsonUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dpcq.ai.entity.RobotEntity;
 import org.dpcq.ai.pojo.req.RobotConnectParam;
-import org.dpcq.ai.rpc.FeignGameApi;
 import org.dpcq.ai.service.RobotService;
 import org.dpcq.ai.service.TableService;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,7 +27,6 @@ public class TableTask {
     private final RobotService robotService;
     // 最少房间数
     private final int minTableNum = 1;
-    private final FeignGameApi feignGameApi;
     private final StringRedisTemplate redisTemplate;
     @Value("${spring.profiles.active}")
     private String profile;
@@ -36,22 +36,24 @@ public class TableTask {
      */
     @Scheduled(initialDelay = 1000 * 5 , fixedDelay = 1000 * 60 * 2)
     public void createTable(){
-        if (isStopRobot() || "local".equals(profile)){
-            return;
-        }
-        long num = tableService.getRobotTable();
-        if (num < minTableNum){
-            RobotEntity freeRobot = robotService.getFreeRobot();
-            if (freeRobot == null){
-                log.info("【创建牌桌失败】当前机器人牌桌：{}, 无空闲机器人",num);
-                return;
-            }
-            Long tableId = tableService.createTableByRobot(freeRobot.getUserId());
-            robotService.connectGame(new RobotConnectParam().setRobotId(freeRobot.getId()).setTableId(tableId));
-            log.info("【创建牌桌成功】当前机器人牌桌：{}, 创建牌桌：{}",num,tableId);
-        }
+//        if (isStopRobot() || "local".equals(profile)){
+//            return;
+//        }
+//        long num = tableService.getRobotTable();
+//        if (num < minTableNum){
+//            RobotEntity freeRobot = robotService.getFreeRobot();
+//            if (freeRobot == null){
+//                log.info("【创建牌桌失败】当前机器人牌桌：{}, 无空闲机器人",num);
+//                return;
+//            }
+//            Long tableId = tableService.createTableByRobot(freeRobot.getUserId());
+//            robotService.connectGame(new RobotConnectParam().setRobotId(freeRobot.getId()).setTableId(tableId));
+//            log.info("【创建牌桌成功】当前机器人牌桌：{}, 创建牌桌：{}",num,tableId);
+//        }
     }
 
+
+    private final String tablesCanJoin_url = "https://test-tgh5.dpcq.work/api/app/table/tablesCanJoin";
     /**
      * 加入者的加入规则：
      *      -牌局每3分钟检测一次：
@@ -61,14 +63,16 @@ public class TableTask {
      */
     @Scheduled(initialDelay = 1000 * 10 , fixedDelay = 1000 * 60 * 3)
     public void joinTable(){
-        if (isStopRobot() || "local".equals(profile)){
+        if (isStopRobot()){
             return;
         }
         List<RobotEntity> freeRobotList = robotService.getFreeRobotList();
         if (freeRobotList.isEmpty()){
             return;
         }
-        List<Long> tableIds = feignGameApi.tablesCanJoin();
+//        List<Long> tableIds = feignGameApi.tablesCanJoin();
+        String s = HttpUtil.get(tablesCanJoin_url);
+        List<Long> tableIds = JsonUtils.parseList(s, Long.class);
         if (tableIds.isEmpty()){
             return;
         }

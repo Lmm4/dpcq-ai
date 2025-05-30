@@ -7,7 +7,6 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
-@EnableFeignClients
 @EnableScheduling
 @EnableAsync
 public class DpcqAiApplication {
