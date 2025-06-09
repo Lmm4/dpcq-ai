@@ -34,6 +34,9 @@ public class MessageProcessor {
         if (message.equals("pong")){
             return;
         }
+        if (message.contains("joinTableSuccess")){
+            return;
+        }
         try {
             JsonNode rootNode = objectMapper.readTree(message);
             String messageType = rootNode.get("ops").asText();
