@@ -65,8 +65,9 @@ public class RobotNotifyHandler implements MessageHandler{
             redisTemplate.opsForValue().set(String.format(Constants.ROBOT_ONLINE_KEY, userId), JsonUtils.toJsonString(sessionHandler.getRobotInfo()), 3, TimeUnit.MINUTES);
 
         }catch (Exception e){
-            log.error("解析机器人数据报错");
             e.printStackTrace();
+            log.error("解析机器人数据报错",e);
+
         }
     }
     /**
@@ -145,9 +146,6 @@ public class RobotNotifyHandler implements MessageHandler{
                 }
             });
             double total = fields.values().stream().mapToDouble(Double::doubleValue).sum();
-            if (total <= 0) {
-                throw new IllegalArgumentException("字段值的总和必须大于0");
-            }
             double randomValue = new Random().nextDouble() * total;
             double cumulative = 0;
             String op = "";
@@ -182,9 +180,10 @@ public class RobotNotifyHandler implements MessageHandler{
             if (action.getOps().equals(Ops.FOLD) && json.contains("check")){
                 setBetAction(action, 0L);
             }
-        } catch (JsonProcessingException e) {
-            log.error("解析AI响应数据出错");
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            log.error("解析AI响应数据出错", e);
+            action.setOps(Ops.FOLD);
+            action.setChips(null);
         }
     }
 
